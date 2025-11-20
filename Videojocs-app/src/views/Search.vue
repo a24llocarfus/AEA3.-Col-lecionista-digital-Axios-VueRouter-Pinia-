@@ -1,16 +1,32 @@
-<template>
-  <section>
-    <h1>Cerca</h1>
-    <p>Pàgina on l'usuari buscarà elements.</p>
-
-    <!-- Exemple de llistat simple amb enllaços al detall -->
-    <ul>
-      <li v-for="id in [1,2,3]" :key="id">
-        <router-link :to="{ name: 'ItemDetail', params: { id } }">Veure item {{ id }}</router-link>
-      </li>
-    </ul>
-  </section>
-</template>
-
 <script setup>
+import { ref, onMounted } from "vue";
+import { getAllGames } from "../services/communicationManager.js";
+
+const games = ref([]);
+const isLoading = ref(true);
+
+onMounted(async () => {
+  isLoading.value = true;
+  games.value = await getAllGames();   // 👈 aquí obtenim els jocs
+  isLoading.value = false;
+});
 </script>
+
+<template>
+  <div>
+    <h1>Llista de jocs</h1>
+
+    <p v-if="isLoading">Carregant...</p>
+
+    <div v-else>
+      <div 
+        v-for="game in games" 
+        :key="game.id"
+        style="border:1px solid #aaa; margin:8px; padding:10px;"
+      >
+        <h3>{{ game.name }}</h3>
+        <img :src="game.background_image" width="200" />
+      </div>
+    </div>
+  </div>
+</template>
